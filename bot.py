@@ -12,10 +12,10 @@ OWNER_ID = os.environ['OWNER_ID']
 # Buttons
 START_BUTTONS=[
     [
-        InlineKeyboardButton('Source', url='https://t.me/+uYEqaR06XA03OWM1'),
-        InlineKeyboardButton('Project Channel', url='https://t.me/+uYEqaR06XA03OWM1'),
+        InlineKeyboardButton('Join Our Channel', url='https://t.me/+uYEqaR06XA03OWM1'),
+        InlineKeyboardButton('Join Our Channel', url='https://t.me/+uYEqaR06XA03OWM1'),
     ],
-    [InlineKeyboardButton('Author', url="https://t.me/vanshfr")],
+    [InlineKeyboardButton('Admin', url="https://t.me/vanshfr")],
 ]
 
 # Running bot
