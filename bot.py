@@ -78,7 +78,12 @@ async def _main(bot, update):
         # Deny access for other users
         return
 
-    copied = await update.copy(chat_id=update.from_user.id)
+    try:
+        copied = await update.copy(chat_id=update.from_user.id)
+    except Exception as e:
+        print(f"Error copying file: {e}")
+        return
+
     msg_id = copied.id
     if copied.video:
         unique_idx = copied.video.file_unique_id
@@ -90,10 +95,14 @@ async def _main(bot, update):
         unique_idx = copied.document.file_unique_id
     elif copied.sticker:
         unique_idx = copied.sticker.file_unique_id
-    elif copied.animation:
+    elif copied.animation:Okay, got it. Here's the updated code without the force join feature:
+
         unique_idx = copied.animation.file_unique_id
     elif copied.voice:
-        unique_idx = copied.voice.file_unique_id
+        unique_idx = copied.voice.file_
+import os
+from pyrogram import Client, filters
+from pyrogram.types import InlineKeyboardButtonunique_id
     elif copied.video_note:
         unique_idx = copied.video_note.file_unique_id
     else:
@@ -106,7 +115,13 @@ async def _main(bot, update):
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton('Sharing Link',
                                   url=f'https://t.me/{xbot_username}?start={unique_idx.lower()}')]
-        ])
+        ]), InlineKeyboardMarkup
+
+# Configs
+API_HASH = os.environ['API_HASH']
+APP_ID = int(os.environ['APP_ID'])
+BOT_TOKEN = os.environ['BOT_TOKEN']
+OWNER_ID = os
     )
     await asyncio.sleep(0.5)  # Wait do to avoid 5 sec flood ban
 
