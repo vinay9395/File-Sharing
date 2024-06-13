@@ -7,9 +7,13 @@ API_HASH = os.environ['API_HASH']
 APP_ID = int(os.environ['APP_ID'])
 BOT_TOKEN = os.environ['BOT_TOKEN']
 OWNER_ID = os.environ['OWNER_ID']
+CHANNEL_USERNAME = os.environ['CHANNEL_USERNAME']
 
 # Buttons
 START_BUTTONS=[
+    [
+        InlineKeyboardButton('Join Channel', url=f'https://t.me/{CHANNEL_USERNAME}'),
+    ],
     [
         InlineKeyboardButton('Admin', url="https://t.me/vanshfr"),
     ],
@@ -93,7 +97,8 @@ async def _main(bot, update):
         True,
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton('Sharing Link',
-                                  url=f'https://t.me/{xbot_username}?start={unique_idx.lower()}')]
+                                  url=f'https://t.me/{xbot_username}?start={unique_idx.lower()}')],
+            [InlineKeyboardButton('Join Channel', url=f'https://t.me/{CHANNEL_USERNAME}')]
         ])
     )
     await asyncio.sleep(0.5)  # Wait do to avoid 5 sec flood ban
