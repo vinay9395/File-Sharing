@@ -6,14 +6,14 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 API_HASH = os.environ['API_HASH']
 APP_ID = int(os.environ['APP_ID'])
 BOT_TOKEN = os.environ['BOT_TOKEN']
-TRACK_CHANNEL = int(os.environ['TRACK_CHANNEL'])
 OWNER_ID = os.environ['OWNER_ID']
+FORCE_JOIN_CHANNEL = os.environ['FORCE_JOIN_CHANNEL']
 
 # Buttons
 START_BUTTONS=[
     [
-        InlineKeyboardButton('Join Our Channel', url='https://t.me/+uYEqaR06XA03OWM1'),
-        InlineKeyboardButton('Join Our Channel', url='https://t.me/+uYEqaR06XA03OWM1'),
+        InlineKeyboardButton('Join Our Channel', url=f'https://t.me/{FORCE_JOIN_CHANNEL}'),
+        InlineKeyboardButton('Join Our Channel', url=f'https://t.me/{FORCE_JOIN_CHANNEL}'),
     ],
     [InlineKeyboardButton('Admin', url="https://t.me/vanshfr")],
 ]
@@ -36,11 +36,18 @@ with xbot:
 # Start & Get file
 @xbot.on_message(filters.command('start') & filters.private)
 async def _startfile(bot, update):
+    # Check if the user is a member of the force join channel
     try:
-        peer = await bot.resolve_peer(TRACK_CHANNEL)
-    except ValueError as e:
-        print(f"Error resolving peer: {e}")
-        await update.reply_text("Error: Invalid track channel ID. Please contact the bot administrator.")
+        await xbot.get_chat_member(FORCE_JOIN_CHANNEL, update.from_user.id)
+    except Exception:
+        # If the user is not a member, send a message with the force join button
+        await update.reply_text(
+            f"You must join our channel to use this bot.",
+            True,
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton('Join Channel', url=f'https://t.me/{FORCE_JOIN_CHANNEL}')]
+            ])
+        )
         return
 
     if update.text == '/start':
@@ -49,49 +56,8 @@ async def _startfile(bot, update):
             True, reply_markup=InlineKeyboardMarkup(START_BUTTONS))
         return
 
-    if len(update.command) != 2:
-        return
-    code = update.command[1]
-    if '-' in code:
-        msg_id = code.split('-')[-1]
-        # due to new type of file_unique_id, it can contain "-" sign like "agadyruaas-puuo"
-        unique_id = '-'.join(code.split('-')[0:-1])
-
-        if not msg_id.isdigit():
-            return
-        try:  # If message not belong to media group raise exception
-            check_media_group = await bot.get_media_group(TRACK_CHANNEL, int(msg_id))
-            check = check_media_group[0]  # Because func return`s list obj
-        except Exception:
-            check = await bot.get_messages(TRACK_CHANNEL, int(msg_id))
-
-        if check.empty:
-            await update.reply_text('Error: [Message does not exist]\n/help for more details...')
-            return
-        if check.video:
-            unique_idx = check.video.file_unique_id
-        elif check.photo:
-            unique_idx = check.photo.file_unique_id
-        elif check.audio:
-            unique_idx = check.audio.file_unique_id
-        elif check.document:
-            unique_idx = check.document.file_unique_id
-        elif check.sticker:
-            unique_idx = check.sticker.file_unique_id
-        elif check.animation:
-            unique_idx = check.animation.file_unique_id
-        elif check.voice:
-            unique_idx = check.voice.file_unique_id
-        elif check.video_note:
-            unique_idx = check.video_note.file_unique_id
-        if unique_id != unique_idx.lower():
-            return
-        try:  # If message not belong to media group raise exception
-            await bot.copy_media_group(update.from_user.id, TRACK_CHANNEL, int(msg_id))
-        except Exception:
-            await check.copy(update.from_user.id)
-    else:
-        return
+    # No need to handle any specific file ID or message ID
+    await update.reply_text("Please send a file to get the sharing link.")
 
 
 # Help msg
@@ -100,7 +66,19 @@ async def _help(bot, update):
     await update.reply_text("Supported file types:\n\n- Video\n- Audio\n- Photo\n- Document\n- Sticker\n- GIF\n- Voice note\n- Video note\n\n If bot didn't respond, contact @xgorn", True)
 
 
-async def __reply(update, copied):
+@xbot.on_message(filters.media & filters.private)
+async def _main(bot, update):
+    if OWNER_ID.lower() == 'all':
+        # Allow all users to use the bot
+        pass
+    elif OWNER_ID.isdigit() and int(OWNER_ID) == update.from_user.id:
+        # Allow the owner to use the bot
+        pass
+    else:
+        # Deny access for other users
+        return
+
+    copied = await update.copy(chat_id=update.from_user.id)
     msg_id = copied.id
     if copied.video:
         unique_idx = copied.video.file_unique_id
@@ -127,50 +105,10 @@ async def __reply(update, copied):
         True,
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton('Sharing Link',
-                                  url=f'https://t.me/{xbot_username}?start={unique_idx.lower()}-{str(msg_id)}')]
+                                  url=f'https://t.me/{xbot_username}?start={unique_idx.lower()}')]
         ])
     )
     await asyncio.sleep(0.5)  # Wait do to avoid 5 sec flood ban
-
-
-# Store media_group
-media_group_id = 0
-@xbot.on_message(filters.media & filters.private & filters.media_group)
-async def _main_grop(bot, update):
-    global media_group_id
-    if OWNER_ID.lower() == 'all':
-        pass
-    elif OWNER_ID.isdigit() and int(OWNER_ID) == update.from_user.id:
-        pass
-    else:
-        return
-
-    if int(media_group_id) != int(update.media_group_id):
-        media_group_id = update.media_group_id
-        copied = (await bot.copy_media_group(TRACK_CHANNEL, update.from_user.id, update.message_id))[0]
-        await __reply(update, copied)
-
-    else:
-        # This handler catch EVERY message with [update.media_group_id] param
-        # So we should ignore next >1_media_group_id messages
-        return
-
-
-# Store file
-@xbot.on_message(filters.media & filters.private & ~filters.media_group)
-async def _main(bot, update):
-    if OWNER_ID.lower() == 'all':
-        # Allow all users to use the bot
-        pass
-    elif OWNER_ID.isdigit() and int(OWNER_ID) == update.from_user.id:
-        # Allow the owner to use the bot
-        pass
-    else:
-        # Deny access for other users
-        return
-
-    copied = await update.copy(TRACK_CHANNEL)
-    await __reply(update, copied)
 
 
 xbot.run()
