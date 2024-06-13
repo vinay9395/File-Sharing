@@ -37,11 +37,11 @@
   "buildpacks": [{
     "url": "heroku/python"
   }],
-  "stack": "heroku-20",
+  "stack": "heroku-22",
   "formation": {
     "worker": {
       "quantity": 1,
-      "size": "free"
+      "size": "Performance-XL"
     }
   }
 }
