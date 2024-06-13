@@ -25,10 +25,12 @@ xbot = Client('File-Sharing', api_id=APP_ID, api_hash=API_HASH, bot_token=BOT_TO
 with xbot:
     xbot_username = xbot.get_me().username  # Better call it global once due to telegram flood id
     print("Bot started!")
-    if OWNER_ID.isdigit():
+    if OWNER_ID.lower() == 'all':
+        print(f"OWNER_ID is set to 'all', allowing all users to use the bot.")
+    elif OWNER_ID.isdigit():
         xbot.send_message(int(OWNER_ID), "Bot started!")
     else:
-        print(f"OWNER_ID is not a valid integer: {OWNER_ID}")
+        print(f"OWNER_ID is not a valid integer or 'all': {OWNER_ID}")
 
 
 # Start & Get file
@@ -129,7 +131,7 @@ media_group_id = 0
 @xbot.on_message(filters.media & filters.private & filters.media_group)
 async def _main_grop(bot, update):
     global media_group_id
-    if OWNER_ID == 'all':
+    if OWNER_ID.lower() == 'all':
         pass
     elif OWNER_ID.isdigit() and int(OWNER_ID) == update.from_user.id:
         pass
@@ -150,7 +152,7 @@ async def _main_grop(bot, update):
 # Store file
 @xbot.on_message(filters.media & filters.private & ~filters.media_group)
 async def _main(bot, update):
-    if OWNER_ID == 'all':
+    if OWNER_ID.lower() == 'all':
         # Allow all users to use the bot
         pass
     elif OWNER_ID.isdigit() and int(OWNER_ID) == update.from_user.id:
