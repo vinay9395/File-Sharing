@@ -36,6 +36,13 @@ with xbot:
 # Start & Get file
 @xbot.on_message(filters.command('start') & filters.private)
 async def _startfile(bot, update):
+    try:
+        peer = await bot.resolve_peer(TRACK_CHANNEL)
+    except ValueError as e:
+        print(f"Error resolving peer: {e}")
+        await update.reply_text("Error: Invalid track channel ID. Please contact the bot administrator.")
+        return
+
     if update.text == '/start':
         await update.reply_text(
             f"I'm File-Sharing!\nYou can share any telegram files and get the sharing link using this bot!\n\n/help for more details...",
