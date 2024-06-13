@@ -146,9 +146,9 @@ async def _main_grop(bot, update):
 # Store file
 @xbot.on_message(filters.media & filters.private & ~filters.media_group)
 async def _main(bot, update):
-if OWNER_ID == 'all':
+                              if OWNER_ID == 'all':
     # Allow all users to use the bot
-    pass
+                                                        pass
 elif int(OWNER_ID) == update.from_user.id:
     # Allow the owner to use the bot
     pass
