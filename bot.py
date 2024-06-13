@@ -12,12 +12,9 @@ OWNER_ID = os.environ['OWNER_ID']
 #Button
 START_BUTTONS=[
     [
-        InlineKeyboardButton('Source', url='https://github.com/X-Gorn/File-Sharing'),
-        InlineKeyboardButton('Project Channel', url='https://t.me/xTeamBots'),
+        InlineKeyboardButton('Admin', url='T.me/Vanshfr'),
+        InlineKeyboardButton('Join Our Channel', url='https://t.me/+uYEqaR06XA03OWM1'),
     ],
-    [InlineKeyboardButton('Author', url="https://t.me/xgorn")],
-]
-
 # Running bot
 xbot = Client('File-Sharing', api_id=APP_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 # Notify about bot start
