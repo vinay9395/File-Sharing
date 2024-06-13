@@ -88,7 +88,7 @@ async def _help(bot, update):
 
 
 async def __reply(update, copied):
-    msg_id = copied.message_id
+    msg_id = copied.id
     if copied.video:
         unique_idx = copied.video.file_unique_id
     elif copied.photo:
@@ -117,7 +117,8 @@ async def __reply(update, copied):
                                   url=f'https://t.me/{xbot_username}?start={unique_idx.lower()}-{str(msg_id)}')]
         ])
     )
-    await asyncio.sleep(0.5)  # Wait do to avoid 5 sec flood ban 
+    await asyncio.sleep(0.5)  # Wait do to avoid 5 sec flood ban
+
 
 # Store media_group
 media_group_id = 0
