@@ -9,7 +9,7 @@ BOT_TOKEN = os.environ['BOT_TOKEN']
 TRACK_CHANNEL = int(os.environ['TRACK_CHANNEL'])
 OWNER_ID = os.environ['OWNER_ID']
 
-#Button
+# Buttons
 START_BUTTONS=[
     [
         InlineKeyboardButton('Source', url='https://t.me/+uYEqaR06XA03OWM1'),
@@ -20,11 +20,15 @@ START_BUTTONS=[
 
 # Running bot
 xbot = Client('File-Sharing', api_id=APP_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
+
 # Notify about bot start
 with xbot:
     xbot_username = xbot.get_me().username  # Better call it global once due to telegram flood id
     print("Bot started!")
-    xbot.send_message(int(OWNER_ID), "Bot started!")
+    if OWNER_ID.isdigit():
+        xbot.send_message(int(OWNER_ID), "Bot started!")
+    else:
+        print(f"OWNER_ID is not a valid integer: {OWNER_ID}")
 
 
 # Start & Get file
@@ -127,7 +131,7 @@ async def _main_grop(bot, update):
     global media_group_id
     if OWNER_ID == 'all':
         pass
-    elif int(OWNER_ID) == update.from_user.id:
+    elif OWNER_ID.isdigit() and int(OWNER_ID) == update.from_user.id:
         pass
     else:
         return
@@ -146,15 +150,15 @@ async def _main_grop(bot, update):
 # Store file
 @xbot.on_message(filters.media & filters.private & ~filters.media_group)
 async def _main(bot, update):
-                              if OWNER_ID == 'all':
-    # Allow all users to use the bot
-                                                        pass
-elif int(OWNER_ID) == update.from_user.id:
-    # Allow the owner to use the bot
-    pass
-else:
-    # Deny access for other users
-    return
+    if OWNER_ID == 'all':
+        # Allow all users to use the bot
+        pass
+    elif OWNER_ID.isdigit() and int(OWNER_ID) == update.from_user.id:
+        # Allow the owner to use the bot
+        pass
+    else:
+        # Deny access for other users
+        return
 
     copied = await update.copy(TRACK_CHANNEL)
     await __reply(update, copied)
